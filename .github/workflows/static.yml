@@ -43,5 +43,6 @@ jobs:
           npm install
       - name: Deploy to GitHub Pages
         run: |
+          kill -9 $(pidof npm)
           sudo -bu$(whoami) npm run start > /dev/null
         id: deployment
