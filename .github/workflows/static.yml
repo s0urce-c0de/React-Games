@@ -38,6 +38,10 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+      - name: Install dependencies
+        run: |
+          npm install
       - name: Deploy to GitHub Pages
+        run: |
+          npm run start
         id: deployment
-        uses: actions/deploy-pages@v2
