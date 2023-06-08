@@ -13,16 +13,17 @@
 }
 
 .Card a {
-  border-radius: 100px;
-  background-color: blue;
-  padding: 10px 50px;
-  text-decoration: none;
-  color: white;
-  font-family: 'Press Start 2P';
-  font-weight: thin;
-  position: absolute;
-  bottom: 20px;
-  max-width: calc(20%-10px);
+	background-color: blue;
+	border-radius: 100px;
+	bottom: 20px;
+	color: #fff;
+	max-width: calc(20% - 10px);
+	min-width: 200px;
+	padding: 3% 10%;
+	text-decoration: none;
+	max-height: 10%;
+	position: absolute;
+	font-family: 'Press Start 2P';
 }
 
 .Card h4 {
