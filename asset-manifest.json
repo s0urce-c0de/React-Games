@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/React-Games/static/css/main.667685ec.css",
+    "main.css": "/React-Games/static/css/main.9d428519.css",
     "main.js": "/React-Games/static/js/main.882e023c.js",
     "static/media/PS2P.ttf": "/React-Games/static/media/PS2P.c4f6a3d49cd1dd4f5ca8.ttf",
     "static/media/PS2P.eot": "/React-Games/static/media/PS2P.b51b7c5c1ea8f10576da.eot",
     "static/media/PS2P.woff2": "/React-Games/static/media/PS2P.c0bab7197a298d243792.woff2",
     "static/media/PS2P.woff": "/React-Games/static/media/PS2P.9438a6ffbc33e5c019a0.woff",
     "index.html": "/React-Games/index.html",
-    "main.667685ec.css.map": "/React-Games/static/css/main.667685ec.css.map",
+    "main.9d428519.css.map": "/React-Games/static/css/main.9d428519.css.map",
     "main.882e023c.js.map": "/React-Games/static/js/main.882e023c.js.map"
   },
   "entrypoints": [
-    "static/css/main.667685ec.css",
+    "static/css/main.9d428519.css",
     "static/js/main.882e023c.js"
   ]
 }
