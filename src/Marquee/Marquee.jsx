@@ -13,7 +13,7 @@ function renderChildren(children) {
 export default function Marquee(props) {
   const [hovered, setHovered] = useState(false);
   let flattened_children=renderChildren(props.children);
-  length=flattened_children.length
+  let length=flattened_children.length;
   let content_styles={
     width: `calc(${length}*(20px-10px+var(--gap)))`,
     animation: `scroll ${length*5}s linear infinite`,
