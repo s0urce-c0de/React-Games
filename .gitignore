@@ -129,8 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# 
 .DS_STORE
- */__pycache/
+*/__pycache/
 
- build
+build/*
