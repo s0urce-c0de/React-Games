@@ -3,14 +3,21 @@
   "version": "0.1.0",
   "description": "A website for games made with ReactJS and PyGame.",
   "author": "Kanav Gupta <email.kanavg@gmail.com> (s0urce-c0de.github.io)",
-  "keywords": ["games", "pygame", "website"],
+  "keywords": [
+    "games",
+    "pygame",
+    "website"
+  ],
   "homepage": "https://s0urce-c0de.github.io/React-Games/",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/s0urce-c0de/React-Games.git"
+    "type": "git",
+    "url": "https://github.com/s0urce-c0de/React-Games.git"
   },
   "license": "MIT",
-  "bugs": { "url": "https://github.com/s0urce-c0de/React-Games/issues", "email": "email.kanavg@gmail.com" },
+  "bugs": {
+    "url": "https://github.com/s0urce-c0de/React-Games/issues",
+    "email": "email.kanavg@gmail.com"
+  },
   "main": "src/index.jsx",
   "scripts": {
     "start": "react-scripts start",
@@ -32,5 +39,17 @@
     "gh-pages": "^5.0.0",
     "react-scripts": "^5.0.1"
   },
-  "private": true
+  "private": true,
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
