@@ -1,8 +1,8 @@
 class Image {
-  constructor(width = "auto", height = "auto", x, y, image_src) {
+  constructor(x, y,  width, height, image_src) {
     this.Image = document.createElement('img');
-    this.Image.width = width;
-    this.Image.height = height;
+    this.Image.style.width = width;
+    this.Image.style.height = height;
     this.Image.style.position = "absolute";
     this.Image.style.left = x + "px";
     this.Image.style.top = y + "px";
@@ -16,7 +16,6 @@ class Image {
 
     // Set initial movement values
     this.directions = {};
-
     // Add event listeners for arrow key movement
     document.addEventListener("keydown", (event) => {
       switch (event.key) {
@@ -38,7 +37,7 @@ class Image {
           break;
       }
     });
-
+    
     document.addEventListener("keyup", (event) => {
       switch (event.key) {
         case "ArrowLeft":
@@ -62,27 +61,28 @@ class Image {
 
     // Update the image position every 16 milliseconds (60 frames per second)
     setInterval(() => {
-      if (this.directions.left) {
-        this.Image.style.left = parseInt(this.Image.style.left) - 1 + "px";
-      }
-      if (this.directions.right) {
-        this.Image.style.left = parseInt(this.Image.style.left) + 1 + "px";
-      }
-      if (this.directions.up) {
-        this.Image.style.top = parseInt(this.Image.style.top) - 1 + "px";
-      }
-      if (this.directions.down) {
-        this.Image.style.top = parseInt(this.Image.style.top) + 1 + "px";
-      }
+      if (this.shouldMove) {
+        if (this.directions.left) {
+          this.Image.style.left = parseInt(this.Image.style.left) - 1 + "px";
+        }
+        if (this.directions.right) {
+          this.Image.style.left = parseInt(this.Image.style.left) + 1 + "px";
+        }
+        if (this.directions.up) {
+          this.Image.style.top = parseInt(this.Image.style.top) - 1 + "px";
+        }
+        if (this.directions.down) {
+          this.Image.style.top = parseInt(this.Image.style.top) + 1 + "px";
+        }}
     }, 16);
   }
 
-  startMovement(direction) {
-    this.directions[direction] = true;
+  startMovement() {
+    this.shouldMove = true;
   }
 
   stopMovement(direction) {
-    this.directions[direction] = false;
+    this.shouldMove=false;
   }
 
   display() {
@@ -92,9 +92,13 @@ class Image {
   hide() {
     this.Image.style.display = "none";
   }
-}
+  
+};
 
-let img1 = new Image(50, 50, 100, 100, 'img1.webp');
-let img2 = new Image(100, 100, 300, 300, 'img2.png');
+let img1 = new Image(100, 100, 50, 50, 'img1.webp');
 img1.display();
+let img2 = new Image(300, 300, 'auto', 'auto', 'img2.png');
 img2.display();
+let img3 = new Image(0, 0, 'auto', 'auto', 'img1.webp');
+img3.startMovement();
+img3.display();
