@@ -13,15 +13,50 @@ if __name__=="__main__":
   manager=multiprocessing.Manager()
 
 pygame.init()
-
 clock=pygame.time.Clock()
 pardir=Path(__file__).resolve().parent
 game_window = pygame.display.set_mode((900, 500),
                                       pygame.RESIZABLE)
 
-images=manager.list([])
+images=manager.list()
+class PickleableSurface(pygame.surface.Surface):
+    def __init__(self, *arg,**kwarg):
+        size = arg[0]
+
+        # size given is not an iterable,  but the object of pgSurf itself
+        if (isinstance(size, pygame.surface.Surface)):
+            pygame.surface.Surface.__init__(self, size=size.get_size(), flags=size.get_flags())
+            self.surface = self
+            self.name='test'
+            self.blit(size, (0, 0))
+
+        else:
+            pygame.surface.Surface.__init__(self, *arg, **kwarg)
+            self.surface = self
+            self.name = 'test'
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        surface = state["surface"]
+
+        _1 = pygame.image.tostring(surface.copy(), "RGBA")
+        _2 = surface.get_size()
+        _3 = surface.get_flags()
+        state["surface_string"] = (_1, _2, _3)
+        return state
+
+    def __setstate__(self, state):
+        surface_string, size, flags = state["surface_string"]
+
+        pygame.surface.Surface.__init__(self, size=size, flags=flags)
+
+        s=pygame.image.fromstring(surface_string, size, "RGBA")
+        state["surface"] =s;
+        self.blit(s,(0,0));self.surface=self;
+        self.__dict__.update(state)
+pygame.Surface, pygame.surface.Surface=PickleableSurface,PickleableSurface
 for i in range(0, 7):
-   images.append(pygame.image.tostring(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))), 'RGB'))
+   images.append(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
 
 words_file=open(pardir.parent / 'words.txt')
 words=words_file.read().split('\n')
@@ -99,23 +134,23 @@ buttons={}
 for char in range(65, 91):
    win_width=game_window.get_width()//15*15
    unit=win_width/15
-   radius=((game_window.get_height()-BY.get_height()-TITLE.get_height()-(game_window.get_height()/(500/216))-30))//8 - 1
+   radius=((game_window.get_height()-BY.get_height()-TITLE.get_height()-images[incorrect].get_height()-30))//8 - 1
    x=unit+win_width-(win_width-((char-65)%13)*unit)
-   y=BY.get_height()+TITLE.get_height()+(game_window.get_height()/(500/216))+2*radius*((char-65)//13) + 90
+   y=BY.get_height()+TITLE.get_height()+images[incorrect].get_height()+2*radius*((char-65)//13) + 90
    buttons[chr(char)]=Button(x, y, radius, 3, '#000000', XL_FONT.render(chr(char), True, '#000000'), update_char, chr(char))
-# def update_images():
-#   while run.value:
-#     for i in range(0, 7):
-#       images[i]=pygame.image.tostring(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
+def update_images():
+  while run.value:
+    for i in range(0, 7):
+      images[i]=pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))
 del win_width, unit, radius, x, y
 try:
   if __name__ == "__main__":
     word = manager.list(random.choice(words))
     guessed_word=manager.list('_'*len(word))
     run = manager.Value('i', True)
-    #p1=multiprocessing.Process(target=update_images)
+    p1=multiprocessing.Process(target=update_images)
     print(word)
-    #p1.start()
+    p1.start()
     while run.value:
       # reset level text
       LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
@@ -128,8 +163,7 @@ try:
       # level
       game_window.blit(LEVEL_TEXT, (game_window.get_width()-LEVEL_TEXT.get_width(), 2))
       # hanged man
-      print(pygame.transform.scale((pygame.image.fromstring(images[incorrect], (3344, 3456), 'RGB'), (((game_window.get_width()-game_window.get_height()/(500/216)))/2-game_window.get_width()/6)//1, TITLE.get_height()+50), (int(game_window.get_width()//(900/209)), int(game_window.get_height()//(500/216)))))
-      game_window.blit(pygame.transform.scale((pygame.image.fromstring(images[incorrect], (3456, 3344), 'RGB'), (((game_window.get_width()-game_window.get_height()/(500/216)))/2-game_window.get_width()/6)//1, TITLE.get_height()+50), (int(game_window.get_width()//(900/209)), int(game_window.get_height()//(500/216)))))
+      game_window.blit(images[incorrect], ((game_window.get_width()-images[incorrect].get_width())/2-game_window.get_width()/6//1, TITLE.get_height()+50))
       # for i in range(65, 91):
       #   button=buttons[chr(i)]
       #   win_width=game_window.get_width()//15*15
