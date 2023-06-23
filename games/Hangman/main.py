@@ -18,45 +18,7 @@ pardir=Path(__file__).resolve().parent
 game_window = pygame.display.set_mode((900, 500),
                                       pygame.RESIZABLE)
 
-images=manager.list()
-class PickleableSurface(pygame.surface.Surface):
-    def __init__(self, *arg,**kwarg):
-        size = arg[0]
 
-        # size given is not an iterable,  but the object of pgSurf itself
-        if (isinstance(size, pygame.surface.Surface)):
-            pygame.surface.Surface.__init__(self, size=size.get_size(), flags=size.get_flags())
-            self.surface = self
-            self.name='test'
-            self.blit(size, (0, 0))
-
-        else:
-            pygame.surface.Surface.__init__(self, *arg, **kwarg)
-            self.surface = self
-            self.name = 'test'
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        surface = state["surface"]
-
-        _1 = pygame.image.tostring(surface.copy(), "RGBA")
-        _2 = surface.get_size()
-        _3 = surface.get_flags()
-        state["surface_string"] = (_1, _2, _3)
-        return state
-
-    def __setstate__(self, state):
-        surface_string, size, flags = state["surface_string"]
-
-        pygame.surface.Surface.__init__(self, size=size, flags=flags)
-
-        s=pygame.image.fromstring(surface_string, size, "RGBA")
-        state["surface"] =s;
-        self.blit(s,(0,0));self.surface=self;
-        self.__dict__.update(state)
-pygame.Surface, pygame.surface.Surface=PickleableSurface,PickleableSurface
-for i in range(0, 7):
-   images.append(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
 
 words_file=open(pardir.parent / 'words.txt')
 words=words_file.read().split('\n')
@@ -116,6 +78,24 @@ class Button:
     def is_hover(self, mouse_pos):
         distance = ((self.x - mouse_pos[0])**2 + (self.y - mouse_pos[1])**2)**0.5
         return distance <= self.radius
+class PicklableSurface:
+    def __init__(self, surface):
+        self.surface = surface
+        self.name = "PicklableSurface"
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        surface = state.pop("surface")
+        state["surface_string"] = (pygame.image.tostring(surface, "RGB"), surface.get_size())
+        return state
+
+    def __setstate__(self, state):
+        surface_string, size = state.pop("surface_string")
+        state["surface"] = pygame.image.fromstring(surface_string, size, "RGB")
+        self.__dict__.update(state)
+images=manager.list()
+for i in range(0, 7):
+   images.append(PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))))
 def run_on_subprocess(func):
     @functools.wraps(func)
     def _wrapper(*args, **kwargs):
