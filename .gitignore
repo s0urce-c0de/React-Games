@@ -129,7 +129,10 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# idk how this appeared
 .DS_STORE
-*/__pycache/
+# no pyc files **from** __pycache__ dirs
+__pycache__
 
+# dont push the builds, these are on branch gh-pages
 build/*
