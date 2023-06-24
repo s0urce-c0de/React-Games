@@ -2,14 +2,22 @@
 # -*- encoding: utf-8 -*-
 
 import pygame
+import importlib
 import multiprocessing
 try:multiprocessing.set_start_method('fork')
 except:raise RuntimeWarning("Built for start method fork")
 import functools 
 import random
+import sys
 import os
 from pathlib import Path
-from ..utils import Image, Button, PickableSurface
+#from ..utils import Button, PicklableSurface
+spec = importlib.util.spec_from_file_location("utils", Path(__file__).resolve().parent.parent / 'utils.py')
+utils = importlib.util.module_from_spec(spec)
+sys.modules["utils"] = utils
+spec.loader.exec_module(utils)
+
+Button,PicklableSurface=utils.Button,utils.PicklableSurface
 
 manager=multiprocessing.Manager()
 
