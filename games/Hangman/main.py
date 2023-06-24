@@ -2,15 +2,16 @@
 # -*- encoding: utf-8 -*-
 
 import pygame
-import types
 import multiprocessing
-multiprocessing.set_start_method('fork')
+try:multiprocessing.set_start_method('fork')
+except:raise RuntimeWarning("Built for start method fork")
 import functools 
 import random
+import os
 from pathlib import Path
+from ..utils import Image, Button, PickableSurface
 
-if __name__=="__main__":
-  manager=multiprocessing.Manager()
+manager=multiprocessing.Manager()
 
 pygame.init()
 clock=pygame.time.Clock()
@@ -36,63 +37,6 @@ BY=MINI_FONT.render("By Kanav G.", True, '#000000')
 LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 
 
-class Image(pygame.sprite.Sprite):
-  def __init__(self, x, y, image):
-    super().__init__()
-    self.x = x
-    self.y = y
-    self.image = image
-    self.rect = self.image.get_rect()
-class Button:
-    def __init__(self, x: int, y: int, radius: int, thickness: int =1, color = "#000000", \
-                 image: pygame.surface.Surface = pygame.font.SysFont(None, 0).render('', True, "#000000"), \
-                 onClick: types.FunctionType = (lambda: None), *onClickArgs, **onClickKwargs):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.thickness = thickness
-        self.color = color
-        self.image_raw = image
-        self.onclick=onClick
-        self.onclickargs=onClickArgs
-        self.onclickkwargs=onClickKwargs
-        self.image_rect = self.image_raw.get_rect()
-        self.image_rect.center = (self.x, self.y)
-        self.image = pygame.transform.scale(self.image_raw, (2*self.radius, 2*self.radius))
-        self.clicked=False
-        self.image.blit(self.image, (0,0), (0,0,self.radius*2,self.radius*2))
-        self.should_draw=True
-    def draw(self, screen):
-        mouse_pos = pygame.mouse.get_pos()
-        mouse_clicked = pygame.mouse.get_pressed()[0]
-        hover = self.is_hover(mouse_pos)
-        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
-        screen.blit(self.image, (self.x-self.radius, self.y-self.radius))
-        
-        if hover and mouse_clicked and not self.clicked:
-          self.onclick(*self.onclickargs, **self.onclickkwargs)
-          self.clicked=True
-        elif not mouse_clicked:
-          self.clicked=False
-    
-    def is_hover(self, mouse_pos):
-        distance = ((self.x - mouse_pos[0])**2 + (self.y - mouse_pos[1])**2)**0.5
-        return distance <= self.radius
-class PicklableSurface:
-    def __init__(self, surface):
-        self.surface = surface
-        self.name = "PicklableSurface"
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        surface = state.pop("surface")
-        state["surface_string"] = (pygame.image.tostring(surface, "RGB"), surface.get_size())
-        return state
-
-    def __setstate__(self, state):
-        surface_string, size = state.pop("surface_string")
-        state["surface"] = pygame.image.fromstring(surface_string, size, "RGB")
-        self.__dict__.update(state)
 images=manager.list()
 for i in range(0, 7):
    images.append(PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))))
@@ -123,6 +67,7 @@ def update_images():
     for i in range(0, 7):
       images[i]=pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))
 del win_width, unit, radius, x, y
+__name__="notmain"
 try:
   if __name__ == "__main__":
     word = manager.list(random.choice(words))
@@ -164,5 +109,4 @@ try:
     exit()
 finally:
   pygame.quit()
-  raise
   exit()
