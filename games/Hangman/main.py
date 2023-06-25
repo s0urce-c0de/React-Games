@@ -73,9 +73,8 @@ for char in range(65, 91):
 def update_images():
   while run.value:
     for i in range(0, 7):
-      images[i]=pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))
+      images.insert(i, PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))))
 del win_width, unit, radius, x, y
-__name__="notmain"
 try:
   if __name__ == "__main__":
     word = manager.list(random.choice(words))
@@ -114,6 +113,8 @@ try:
         if event.type == 256:
           run.value=False
     pygame.quit()
+    p1.close()
+    p1.join()
     exit()
 finally:
   pygame.quit()
