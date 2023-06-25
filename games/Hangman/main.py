@@ -20,6 +20,7 @@ spec.loader.exec_module(utils)
 Button,PicklableSurface=utils.Button,utils.PicklableSurface
 
 manager=multiprocessing.Manager()
+lock=manager.Lock()
 
 pygame.init()
 clock=pygame.time.Clock()
@@ -70,17 +71,18 @@ for char in range(65, 91):
    x=unit+win_width-(win_width-((char-65)%13)*unit)
    y=BY.get_height()+TITLE.get_height()+images[incorrect].get_height()+2*radius*((char-65)//13) + 90
    buttons[chr(char)]=Button(x, y, radius, 3, '#000000', XL_FONT.render(chr(char), True, '#000000'), update_char, chr(char))
-def update_images():
+def update_images(lock):
   while run.value:
     for i in range(0, 7):
-      images.insert(i, PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))))
+      with lock:
+        images[i]=PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
 del win_width, unit, radius, x, y
 try:
   if __name__ == "__main__":
     word = manager.list(random.choice(words))
     guessed_word=manager.list('_'*len(word))
     run = manager.Value('i', True)
-    p1=multiprocessing.Process(target=update_images)
+    p1=multiprocessing.Process(target=update_images, args=(lock,))
     print(word)
     p1.start()
     while run.value:
@@ -95,7 +97,8 @@ try:
       # level
       game_window.blit(LEVEL_TEXT, (game_window.get_width()-LEVEL_TEXT.get_width(), 2))
       # hanged man
-      game_window.blit(images[incorrect], ((game_window.get_width()-images[incorrect].get_width())/2-game_window.get_width()/6//1, TITLE.get_height()+50))
+      with lock:
+        game_window.blit(images[incorrect], ((game_window.get_width()-images[incorrect].get_width())/2-game_window.get_width()/6//1, TITLE.get_height()+50))
       # for i in range(65, 91):
       #   button=buttons[chr(i)]
       #   win_width=game_window.get_width()//15*15
