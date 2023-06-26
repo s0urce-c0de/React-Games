@@ -4,7 +4,6 @@ Utilities for games
 
 import pygame
 import types
-import re
 
 pygame.init()
 

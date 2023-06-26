@@ -6,7 +6,7 @@ import importlib
 import multiprocessing
 try:multiprocessing.set_start_method('fork')
 except:raise RuntimeWarning("Built for start method fork")
-import functools 
+import functools
 import random
 import sys
 import os
@@ -16,7 +16,6 @@ spec = importlib.util.spec_from_file_location("utils", Path(__file__).resolve().
 utils = importlib.util.module_from_spec(spec)
 sys.modules["utils"] = utils
 spec.loader.exec_module(utils)
-
 Button,PicklableSurface=utils.Button,utils.PicklableSurface
 
 manager=multiprocessing.Manager()
@@ -73,8 +72,8 @@ for char in range(65, 91):
    buttons[chr(char)]=Button(x, y, radius, 3, '#000000', XL_FONT.render(chr(char), True, '#000000'), update_char, chr(char))
 def update_images(lock):
   while run.value:
-    for i in range(0, 7):
-      with lock:
+    with lock:
+      for i in range(0, 7):
         images[i]=PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
 del win_width, unit, radius, x, y
 try:
@@ -98,7 +97,7 @@ try:
       game_window.blit(LEVEL_TEXT, (game_window.get_width()-LEVEL_TEXT.get_width(), 2))
       # hanged man
       with lock:
-        game_window.blit(images[incorrect], ((game_window.get_width()-images[incorrect].get_width())/2-game_window.get_width()/6//1, TITLE.get_height()+50))
+        game_window.blit(images[incorrect].surface, ((game_window.get_width()-images[incorrect].get_width())/2-game_window.get_width()/6//1, TITLE.get_height()+50))
       # for i in range(65, 91):
       #   button=buttons[chr(i)]
       #   win_width=game_window.get_width()//15*15
@@ -116,9 +115,8 @@ try:
         if event.type == 256:
           run.value=False
     pygame.quit()
-    p1.close()
-    p1.join()
     exit()
 finally:
+  raise
   pygame.quit()
   exit()
