@@ -30,7 +30,7 @@ game_window = pygame.display.set_mode((900, 500),
                                       pygame.RESIZABLE)
 pygame.display.set_caption("Hangman")
 pygame.display.set_icon(pygame.image.load(projdir / 'public' / 'favicon.svg'))
-
+game_window.fill("#FFFFFF")
 
 words_file=open(pardir.parent / 'words.txt')
 words=words_file.read().split('\n')
@@ -49,13 +49,11 @@ LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 
 
 if __name__=="__main__":
-  images=manager.list()
+  images=manager.list([PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png').convert_alpha(), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))) for i in range(0, 7)])
   image_lock=manager.Lock()
 else:
-  images=[]
+  images=[PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png').convert_alpha(), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))) for i in range(0, 7)]
   image_lock=None
-for i in range(0, 7):
-   images.append(PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216)))))
 def run_on_subprocess(func) -> types.FunctionType:
     @functools.wraps(func)
     def _wrapper(*args, **kwargs):
@@ -84,7 +82,7 @@ for char in range(65, 91):
    radius=((game_window.get_height()-BY.get_height()-TITLE.get_height()-images[incorrect].get_height()-30))//8 - 1
    x=unit+win_width-(win_width-((char-65)%13)*unit)
    y=BY.get_height()+TITLE.get_height()+images[incorrect].get_height()+2*radius*((char-65)//13) + 90
-   buttons[chr(char)]=Button(x, y, radius, 3, '#000000', XL_FONT.render(chr(char), True, '#000000'), update_char, chr(char))
+   buttons[chr(char)]=Button(x, y, radius, 3, '#000000', XL_FONT.render(chr(char), True, '#000000').convert_alpha(), update_char, chr(char))
 def generate_word(printw: bool = True) -> str:
   word=random.choice(words)
   if printw:
@@ -92,8 +90,8 @@ def generate_word(printw: bool = True) -> str:
   return word
 def update_images(lock) -> None:
   while run.value:
-    with lock:
-      for i in range(0, 7):
+    for i in range(0, 7):
+      with lock:
         images[i]=PicklableSurface(pygame.transform.scale(pygame.image.load(pardir/'images'/f'Hangman{i}.png'), (game_window.get_width()//(900/209), game_window.get_height()/(500/216))))
 def update_buttons(lock):
   while run.value:
@@ -119,8 +117,6 @@ if __name__ == "__main__":
     while run.value:
       # reset level text
       LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
-      # set background
-      game_window.fill("#FFFFFF")
       # title
       game_window.blit(TITLE, ((game_window.get_width()-TITLE.get_width())/2, 3))
       # by
@@ -139,7 +135,8 @@ if __name__ == "__main__":
     pygame.quit()
     exit()
   finally:
+    run.value=False
+    pygame.quit
     if dev:
       raise
-    pygame.quit()
     exit()
