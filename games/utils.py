@@ -39,7 +39,6 @@ class Button:
         hover = self.is_hover(mouse_pos)
         pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
         screen.blit(self.image.surface, (self.x-self.radius, self.y-self.radius))
-        print('drawn')
         if hover and mouse_clicked and not self.clicked:
           self.onclick(*self.onclickargs, **self.onclickkwargs)
           self.clicked=True
