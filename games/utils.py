@@ -17,7 +17,7 @@ class Image(pygame.sprite.Sprite):
 class Button:
     def __init__(self, x: int, y: int, radius: int, thickness: int =1, color = "#000000", \
                  image: pygame.surface.Surface = pygame.font.SysFont(None, 0).render('', True, "#000000"), \
-                 onClick: types.FunctionType = (lambda: None), *onClickArgs, **onClickKwargs) -> None:
+                 onClick: types.FunctionType = (lambda *args, **kwargs: ...), *onClickArgs, **onClickKwargs) -> None:
         self.x = x
         self.y = y
         self.radius = radius
