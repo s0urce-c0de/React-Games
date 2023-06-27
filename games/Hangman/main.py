@@ -28,7 +28,8 @@ pardir=Path(__file__).resolve().parent
 projdir=Path(__file__).resolve().parent.parent.parent
 game_window = pygame.display.set_mode((900, 500),
                                       pygame.RESIZABLE)
-
+pygame.display.set_caption("Hangman")
+pygame.display.set_icon(pygame.image.load(projdir / 'public' / 'favicon.svg'))
 
 
 words_file=open(pardir.parent / 'words.txt')
