@@ -23,23 +23,23 @@ class Button:
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.image_raw = image
+        self.image_raw = PicklableSurface(image)
         self.onclick=onClick
         self.onclickargs=onClickArgs
         self.onclickkwargs=onClickKwargs
         self.image_rect = self.image_raw.get_rect()
         self.image_rect.center = (self.x, self.y)
-        self.image = pygame.transform.scale(self.image_raw, (2*self.radius, 2*self.radius))
+        self.image = PicklableSurface(pygame.transform.scale(self.image_raw.surface, (2*self.radius, 2*self.radius)))
         self.clicked=False
-        self.image.blit(self.image, (0,0), (0,0,self.radius*2,self.radius*2))
+        self.image.surface.blit(self.image.surface, (0,0), (0,0,self.radius*2,self.radius*2))
         self.should_draw=True
     def draw(self, screen) -> None:
         mouse_pos = pygame.mouse.get_pos()
         mouse_clicked = pygame.mouse.get_pressed()[0]
         hover = self.is_hover(mouse_pos)
         pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
-        screen.blit(self.image, (self.x-self.radius, self.y-self.radius))
-        
+        screen.blit(self.image.surface, (self.x-self.radius, self.y-self.radius))
+        print('drawn')
         if hover and mouse_clicked and not self.clicked:
           self.onclick(*self.onclickargs, **self.onclickkwargs)
           self.clicked=True
@@ -57,12 +57,12 @@ class PicklableSurface:
     def __getstate__(self) -> dict:
         state = self.__dict__.copy()
         surface = state.pop("surface")
-        state["surface_string"] = (pygame.image.tostring(surface, "RGB"), surface.get_size())
+        state["surface_string"] = (pygame.image.tostring(surface, "RGBA"), surface.get_size())
         return state
 
     def __setstate__(self, state) -> None:
         surface_string, size = state.pop("surface_string")
-        state["surface"] = pygame.image.fromstring(surface_string, size, "RGB")
+        state["surface"] = pygame.image.fromstring(surface_string, size, "RGBA")
         self.__dict__.update(state)
     
     def __getattr__(self, attr) -> object:
