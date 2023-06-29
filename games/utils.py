@@ -23,22 +23,23 @@ class Button:
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.image_raw = PicklableSurface(image)
+        self.image_raw = image
         self.onclick=onClick
         self.onclickargs=onClickArgs
         self.onclickkwargs=onClickKwargs
         self.image_rect = self.image_raw.get_rect()
         self.image_rect.center = (self.x, self.y)
-        self.image = PicklableSurface(pygame.transform.scale(self.image_raw.surface, (2*self.radius, 2*self.radius)))
+        self.image = pygame.transform.scale(self.image_raw, (2*self.radius, 2*self.radius))
         self.clicked=False
-        self.image.surface.blit(self.image.surface, (0,0), (0,0,self.radius*2,self.radius*2))
+        self.image.blit(self.image, (0,0), (0,0,self.radius*2,self.radius*2))
         self.should_draw=True
-    def draw(self, screen) -> None:
+    def draw(self, screen, force_draw=False) -> None:
         mouse_pos = pygame.mouse.get_pos()
         mouse_clicked = pygame.mouse.get_pressed()[0]
         hover = self.is_hover(mouse_pos)
-        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
-        screen.blit(self.image.surface, (self.x-self.radius, self.y-self.radius))
+        if self.should_draw and not force_draw:
+          pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
+          screen.blit(self.image, (self.x-self.radius, self.y-self.radius))
         if hover and mouse_clicked and not self.clicked:
           self.onclick(*self.onclickargs, **self.onclickkwargs)
           self.clicked=True
