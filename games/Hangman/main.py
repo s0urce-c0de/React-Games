@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
-
 import pygame
-import importlib
+import sys
 import random
 from pathlib import Path
-#from functions4pickle import update_char
-#from ..utils import Button, PicklableSurface
-spec = importlib.util.spec_from_file_location("utils", Path(__file__).resolve().parent.parent / 'utils.py') # type: ignore
-utils = importlib.util.module_from_spec(spec) # type: ignore
-spec.loader.exec_module(utils)
-Button,PicklableSurface,MultiLineText_Blit=utils.CircleButton,utils.PicklableSurface,utils.MultiLineText_Blit
-dev=True
-
+from utils import CircleButton as Button, MultiLineText_Blit
+"""
+compile with 
+python3 -m pyinstaller --onefile --add-data .:. main.py
+on windows replace `:` with `;`
+"""
+PyInstaller=hasattr(sys, '_MEIPASS')
+dev=not PyInstaller
+exit=sys.exit
+if PyInstaller: __file__=Path(sys._MEIPASS) / 'main.py'
 pygame.init()
 clock=pygame.time.Clock()
 pardir=Path(__file__).resolve().parent
-projdir=Path(__file__).resolve().parent.parent.parent
 game_window = pygame.display.set_mode((900, 500),
                                       pygame.RESIZABLE)
 pygame.display.set_caption("Hangman")
@@ -24,17 +24,17 @@ pygame.display.set_icon(pygame.image.load(pardir / 'images' / 'favicon.png'))
 game_window.fill("#FFFFFF")
 pygame.display.update()
 
-words_file=open(pardir.parent / 'words.txt')
+words_file=open(pardir / 'words.txt')
 words=words_file.read().split('\n')
 words_file.close()
 del words_file
 
 level=1
 incorrect=0
-NORMAL_FONT = pygame.font.Font(projdir / 'src' / 'fonts' / 'Press Start 2P' /'PS2P.ttf', 32)
-MINI_FONT = pygame.font.Font(projdir / 'src' / 'fonts' / 'Press Start 2P' /'PS2P.ttf', 13)
-LEVEL_FONT = pygame.font.Font(projdir / 'src' / 'fonts' / 'Press Start 2P' /'PS2P.ttf', 25)
-XL_FONT = pygame.font.Font(projdir / 'src' / 'fonts' / 'Press Start 2P' /'PS2P.ttf', 100)
+NORMAL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 32)
+MINI_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 13)
+LEVEL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 25)
+XL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 100)
 BY=MINI_FONT.render("By Kanav G.", True, '#000000')
 LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 TITLE=NORMAL_FONT.render("Hangman", True, '#000000')
