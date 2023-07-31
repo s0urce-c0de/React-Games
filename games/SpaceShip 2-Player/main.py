@@ -31,7 +31,7 @@ raw_images = {
   },
   'background' : pygame.image.load(pardir / 'images' / 'spacebackground.jpeg')
 }
-#
+
 images = raw_images
 RED_SPACESHIP_COORDS=((HEIGHT-images['spaceships']['red'].get_height())//2,WIDTH/10*7)
 images['spaceships']['red'] = pygame.transform.scale_by(pygame.transform.rotate(images['spaceships']['red'], 270), 0.17)
