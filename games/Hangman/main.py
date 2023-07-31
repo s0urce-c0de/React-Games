@@ -13,7 +13,6 @@ on windows replace `:` with `;`
 PyInstaller=hasattr(sys, '_MEIPASS')
 dev=not PyInstaller
 exit=sys.exit
-if PyInstaller: __file__=Path(sys._MEIPASS) / 'main.py'
 pygame.init()
 clock=pygame.time.Clock()
 pardir=Path(__file__).resolve().parent
@@ -38,6 +37,7 @@ XL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 100)
 BY=MINI_FONT.render("By Kanav G.", True, '#000000')
 LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 TITLE=NORMAL_FONT.render("Hangman", True, '#000000')
+LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 
 raw_images=[pygame.image.load(pardir/'images'/f'Hangman{i}.png') for i in range(0,7)]
 images=[pygame.transform.scale(raw_images[i], (game_window.get_width()//(900/209), game_window.get_height()/(500/216))) for i in range(0, 7)]
@@ -52,7 +52,7 @@ def generate_word(level: int) -> str:
       narrow_word_list.append(word)
   return random.choice(narrow_word_list)
 def new_level() -> None:
-  global word, guessed_word, incorrect, level
+  global word, guessed_word, incorrect, LEVEL_TEXT
   # update level
   level+=1
   # reset ammount of incorrect guesses
@@ -64,6 +64,8 @@ def new_level() -> None:
   guessed_word=['_']*len(word)
   # regenerate all buttons
   for button in buttons: buttons[button].should_draw=True
+  # reset level text
+  LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
 def update_char(char: str) -> None:
   char=char.upper()
   buttons[char].should_draw=False
@@ -113,8 +115,6 @@ if __name__ == "__main__":
       update_images()
       if '_' not in guessed_word:
         new_level()
-      # reset level text
-      LEVEL_TEXT=LEVEL_FONT.render(f"Level: {level}", True, '#000000')
       # title
       game_window.blit(TITLE, ((game_window.get_width()-TITLE.get_width())/2, 3))
       # by

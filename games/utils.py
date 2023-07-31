@@ -4,7 +4,7 @@ Utilities for games
 
 import pygame
 import types
-from typing import Union, Tuple, Sequence, Optional
+from typing import Union, Tuple, Sequence, Optional, Dict, TypedDict
 RGBOutput=Tuple[int, int, int]
 RGBAOutput=Tuple[int, int, int, int]
 Coordinate = Union[Tuple[float, float], Sequence[float], pygame.math.Vector2]
@@ -68,7 +68,6 @@ class PicklableSurface:
     Initialize class
     """
     self.surface = surface
-    self.name = "PicklableSurface"
 
   def __getstate__(self) -> dict:
     """
@@ -112,9 +111,16 @@ def MultiLineText_Blit(surface: pygame.surface.SurfaceType, text: str, pos: Coor
       x += word_width + space
     x = pos[0]  # Reset the x.
     y += word_height  # Start on new row.
-
+class ValidControlsDict(TypedDict, total=False):
+  key_hold_allowed: bool
+  function: types.FunctionType
+  function_args: tuple
+  function_kwargs: dict
 class MovingCharacter:
-  def __init__(self, image: pygame.surface.SurfaceType, x, y, controls='WASD', max_top: Optional[int] = None, max_left: Optional[int] = None, max_bottom: Optional[int] = None, max_right: Optional[int] = None, disable_left: bool = False, disable_right: bool = False, disable_up: bool = False, disable_down: bool = False, extra_controls=()):
+  def __init__(self, image: pygame.surface.SurfaceType, x, y, controls='WASD', max_top: Optional[int] = None, 
+               max_left: Optional[int] = None, max_bottom: Optional[int] = None, max_right: Optional[int] = None, \
+               disable_left: bool = False, disable_right: bool = False, disable_up: bool = False, disable_down: bool = False,\
+               extra_controls: Dict[int, ValidControlsDict] = {}) -> None:
     self.image = image
     self.controls = controls
     self.max_top = max_top
@@ -127,9 +133,15 @@ class MovingCharacter:
     self.disable_right = disable_right
     self.disable_up = disable_up
     self.disable_down = disable_down
+    self.base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
+    for ctrl_dict_key in extra_controls:
+      self.base_extra_controls_dict.update(extra_controls[ctrl_dict_key])
+      extra_controls[ctrl_dict_key]=self.base_extra_controls_dict
+      self.base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
     self.extra_controls = extra_controls
+    self.keys_pressed={}
 
-  def draw(self, target_surf: pygame.surface.SurfaceType, speed: int = 5):
+  def draw(self, target_surf: pygame.surface.SurfaceType, speed: int = 5) -> None:
     # Set default values for max_*
     if self.max_bottom is None:
       self.max_bottom = target_surf.get_height()
@@ -139,7 +151,7 @@ class MovingCharacter:
       self.max_right = target_surf.get_width()
     if self.max_top is None:
       self.max_top = 0
-      
+    
     # Move the character based on the controls
     keys = pygame.key.get_pressed()
 
@@ -171,6 +183,25 @@ class MovingCharacter:
           self.y -= speed
         if not self.disable_down and keys[pygame.key.key_code(control[0])]:
           self.y += speed
+    hold_keys = {}
+    nohold_keys = {}
+    for key in self.extra_controls:
+      if self.extra_controls[key]['key_hold_allowed']: 
+        hold_keys[key] = self.extra_controls[key]
+      elif not self.extra_controls[key]['key_hold_allowed']:
+        nohold_keys[key] = self.extra_controls[key]
+    for key in hold_keys:
+      if keys[key]: 
+        hold_keys[key]['function'](*hold_keys[key]['function_args'], **hold_keys[key]['function_kwargs'])
+    for key in nohold_keys:
+      if keys[key] and not self.keys_pressed.get(key, False):
+        nohold_keys[key]['function'](*nohold_keys[key]['function_args'], **nohold_keys[key]['function_kwargs'])
+        self.keys_pressed[key]=True
+      elif keys[key]:
+        pass
+      else:
+        self.keys_pressed[key]=False
+
 
     # Keep the character within the screen bounds
     self.x = max(self.x, self.max_left)

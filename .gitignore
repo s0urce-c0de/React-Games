@@ -129,9 +129,10 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# idk how this appeared
+# some kind of build file I think
 .DS_STORE
-# no pyc files **from** __pycache__ dirs
+
+# no pyc files from __pycache__ dirs
 __pycache__
 
 # dont push the builds, these are on branch gh-pages, or from pyinstaller

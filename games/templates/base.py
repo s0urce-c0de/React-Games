@@ -3,7 +3,7 @@
 
 import pygame
 import sys
-from utils import CircleButton, MultiLineText_Blit
+from utils import CircleButton as Button, MultiLineText_Blit
 from pathlib import Path
 
 pygame.init()
@@ -25,15 +25,13 @@ level=1
 NORMAL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 32)
 MINI_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 13)
 LEVEL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 25)
-XL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 100)
 BY=MINI_FONT.render("By Kanav G.", True, '#000000')
 TITLE=NORMAL_FONT.render("My Game", True, '#000000')
 
 raw_images = {} # images
-images = {img: raw_images[img] for img in raw_images}
+images = raw_images
 
 def new_level() -> None: ...
-
 
 if __name__ == "__main__":
   try:
@@ -48,9 +46,7 @@ if __name__ == "__main__":
       pygame.display.update()
       # tick the clock
       clock.tick(FPS)
-      for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-          run=False
+      for event in pygame.event.get(pygame.QUIT): run=False
     pygame.quit()
     exit()
   finally:
