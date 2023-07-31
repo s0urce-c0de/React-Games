@@ -134,5 +134,8 @@ dist
 # no pyc files **from** __pycache__ dirs
 __pycache__
 
-# dont push the builds, these are on branch gh-pages
-build/*
+# dont push the builds, these are on branch gh-pages, or from pyinstaller
+build
+# pyinstaller
+dist
+*.spec
