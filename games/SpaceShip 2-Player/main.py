@@ -3,7 +3,7 @@
 
 import pygame
 import sys
-from utils import CircleButton, MultiLineText_Blit
+from utils import MovingCharacter
 from pathlib import Path
 
 pygame.init()
@@ -22,8 +22,6 @@ pygame.display.update()
 level=1
 NORMAL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 32)
 MINI_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 13)
-LEVEL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 25)
-XL_FONT = pygame.font.Font(pardir / 'fonts' / 'PS2P.ttf', 100)
 BY=MINI_FONT.render("By Kanav G.", True, '#FFFFFF')
 TITLE=NORMAL_FONT.render("Spaceship Game", True, '#FFFFFF')
 raw_images = {
@@ -34,21 +32,25 @@ raw_images = {
   'background' : pygame.image.load(pardir / 'images' / 'spacebackground.jpeg')
 }
 images = raw_images
-images['spaceships']['red'] = pygame.transform.rotate(images['spaceships']['red'], 270)
-images['spaceships']['yellow']= pygame.transform.rotate(images['spaceships']['yellow'], 90)
+RED_SPACESHIP_COORDS=((HEIGHT-images['spaceships']['red'].get_height())//2,WIDTH/10*7)
+images['spaceships']['red'] = pygame.transform.scale_by(pygame.transform.rotate(images['spaceships']['red'], 270), 0.17)
+images['spaceships']['yellow']= pygame.transform.scale_by(pygame.transform.rotate(images['spaceships']['yellow'], 90), 0.17)
+RED_SPACESHIP=MovingCharacter(images['spaceships']['red'], RED_SPACESHIP_COORDS[0], RED_SPACESHIP_COORDS[1], 'WASD', None, WIDTH//2, None, None, False, False, False, False)
 game_window.blit(images['background'], (0, 0))
-def new_level() -> None: ...
 
 if __name__ == "__main__":
   try:
     # do some other pregame stuff
     run = True
     while run:
+      # background
+      game_window.blit(images['background'], (0, 0))
       # title
       game_window.blit(TITLE, ((game_window.get_width()-TITLE.get_width())/2, 3))
       # by
       game_window.blit(BY, ((game_window.get_width()-TITLE.get_width())/2+5, 7+TITLE.get_height()))
-      # do some things
+      # spaceships
+      RED_SPACESHIP.draw(game_window)
       pygame.display.update()
       # tick the clock
       clock.tick(FPS)
