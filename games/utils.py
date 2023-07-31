@@ -4,17 +4,11 @@ Utilities for games
 
 import pygame
 import types
-import importlib
-import sys
-from pathlib import Path
-try:
-  from pygame._common import ColorValue, Coordinate
-except ModuleNotFoundError:
-  from typing import Union, Tuple, Sequence
-  RGBOutput=Tuple[int, int, int]
-  RGBAOutput=Tuple[int, int, int, int]
-  Coordinate = Union[Tuple[float, float], Sequence[float], pygame.math.Vector2]
-  ColorValue=Union[pygame.color.Color, int, str, RGBOutput, RGBAOutput, Sequence[int]]
+from typing import Union, Tuple, Sequence, Optional
+RGBOutput=Tuple[int, int, int]
+RGBAOutput=Tuple[int, int, int, int]
+Coordinate = Union[Tuple[float, float], Sequence[float], pygame.math.Vector2]
+ColorValue=Union[pygame.color.Color, int, str, RGBOutput, RGBAOutput, Sequence[int]]
 pygame.init()
 class CircleButton:
   """
@@ -118,3 +112,71 @@ def MultiLineText_Blit(surface: pygame.surface.SurfaceType, text: str, pos: Coor
       x += word_width + space
     x = pos[0]  # Reset the x.
     y += word_height  # Start on new row.
+
+class MovingCharacter:
+  def __init__(self, image: pygame.surface.SurfaceType, x, y, controls='WASD', max_top: Optional[int] = None, max_left: Optional[int] = None, max_bottom: Optional[int] = None, max_right: Optional[int] = None, disable_left: bool = False, disable_right: bool = False, disable_up: bool = False, disable_down: bool = False, extra_controls=()):
+    self.image = image
+    self.controls = controls
+    self.max_top = max_top
+    self.max_left = max_left
+    self.max_bottom = max_bottom
+    self.max_right = max_right
+    self.x = x
+    self.y = y
+    self.disable_left = disable_left
+    self.disable_right = disable_right
+    self.disable_up = disable_up
+    self.disable_down = disable_down
+    self.extra_controls = extra_controls
+
+  def draw(self, target_surf: pygame.surface.SurfaceType, speed: int = 5):
+    # Set default values for max_*
+    if self.max_bottom is None:
+      self.max_bottom = target_surf.get_height()
+    if self.max_left is None:
+      self.max_left = 0
+    if self.max_right is None:
+      self.max_right = target_surf.get_width()
+    if self.max_top is None:
+      self.max_top = 0
+      
+    # Move the character based on the controls
+    keys = pygame.key.get_pressed()
+
+    if self.controls == 'WASD':
+      if not self.disable_left and keys[pygame.K_a]:
+        self.x -= speed
+      if not self.disable_right and keys[pygame.K_d]:
+        self.x += speed
+      if not self.disable_up and keys[pygame.K_w]:
+        self.y -= speed
+      if not self.disable_down and keys[pygame.K_s]:
+        self.y += speed
+    elif self.controls == 'arrow_keys':
+      if not self.disable_left and keys[pygame.K_LEFT]:
+        self.x -= speed
+      if not self.disable_right and keys[pygame.K_RIGHT]:
+        self.x += speed
+      if not self.disable_up and keys[pygame.K_UP]:
+        self.y -= speed
+      if not self.disable_down and keys[pygame.K_DOWN]:
+        self.y += speed
+    else:
+      for control in self.controls:
+        if not self.disable_left and keys[pygame.key.key_code(control[0])]:
+          self.x -= speed
+        if not self.disable_right and keys[pygame.key.key_code(control[0])]:
+          self.x += speed
+        if not self.disable_up and keys[pygame.key.key_code(control[0])]:
+          self.y -= speed
+        if not self.disable_down and keys[pygame.key.key_code(control[0])]:
+          self.y += speed
+
+    # Keep the character within the screen bounds
+    self.x = max(self.x, self.max_left)
+    self.x = min(self.x, self.max_right - self.image.get_width())
+    self.y = max(self.y, self.max_top)
+    self.y = min(self.y, self.max_bottom - self.image.get_height())
+
+    # Draw the character on the target surface
+    target_surf.blit(self.image, (self.x, self.y))
