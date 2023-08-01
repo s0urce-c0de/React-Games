@@ -13,12 +13,19 @@ pygame.init()
 class CircleButton:
   """
   A PyGame Circular Button.
-  Assumes that you constantly blit in 
-  `while True` game loop
   """
-  def __init__(self, x: int, y: int, radius: int, thickness: int =1, color: ColorValue= "#000000", \
-        image: pygame.surface.SurfaceType = pygame.font.SysFont(None, 0).render('', True, "#000000"), \
-        onClick: types.FunctionType = (lambda *args, **kwargs: ...), *onClickArgs, **onClickKwargs) -> None:
+  def __init__(
+      self,
+      x: int,
+      y: int,
+      radius: int,
+      thickness: int = 1,
+      color: ColorValue = (0, 0, 0, 0),
+      image: pygame.surface.SurfaceType = pygame.font.SysFont(None, 0).render('', True, "#000000"),
+      onClick: types.FunctionType = (lambda *args, **kwargs: ...),
+      *onClickArgs,
+      **onClickKwargs
+      ) -> None:
     """
     Initialize The Button
     """
@@ -33,32 +40,147 @@ class CircleButton:
     self.onclickkwargs=onClickKwargs
     self.image_rect = self.image_raw.get_rect()
     self.image_rect.center = (self.x, self.y)
-    self.image = pygame.transform.scale(self.image_raw, (2*self.radius, 2*self.radius))
+    self.image = pygame.transform.smoothscale(self.image_raw, (2*self.radius, 2*self.radius))
     self.clicked=False
     self.image.blit(self.image, (0,0), (0,0,self.radius*2,self.radius*2))
     self.should_draw=True
-  def draw(self, screen: pygame.surface.SurfaceType, force_draw=False) -> None:
+
+  def draw(
+      self,
+      screen: pygame.surface.SurfaceType,
+      force_draw=False
+      ) -> None:
     """
     Draw the button correctly
     """
     mouse_pos = pygame.mouse.get_pos()
     mouse_clicked = pygame.mouse.get_pressed()[0]
     hover = self.is_hover(mouse_pos)
+
     if self.should_draw and not force_draw:
-      pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius, self.thickness)
-      screen.blit(self.image, (self.x-self.radius, self.y-self.radius))
-      if hover and mouse_clicked and not self.clicked:
+      pygame.draw.circle(
+        screen,
+        self.color,
+        (
+          self.x,
+          self.y
+        ),
+        self.radius,
+        self.thickness)
+      screen.blit(
+        self.image,
+        (self.x-self.radius, self.y-self.radius)
+        )
+
+      if hover and mouse_clicked and self.should_draw and not self.clicked:
         self.onclick(*self.onclickargs, **self.onclickkwargs)
         self.clicked=True
+
       elif not mouse_clicked:
         self.clicked=False
+
+  def hide(self) -> None:
+    self.should_draw=False
+
+  def show(self) -> None:
+    self.should_draw=True
   
   def is_hover(self, mouse_pos) -> bool:
     """
     Check if mouse is hover over button
     """
-    distance = ((self.x - mouse_pos[0])**2 + (self.y - mouse_pos[1])**2)**0.5
-    return distance <= self.radius
+    return (
+      (self.x - mouse_pos[0])**2 + \
+      (self.y - mouse_pos[1])**2)**0.5 \
+      <= self.radius
+class RectangularButton:
+  """
+  A PyGame Rectangular Button with Rounded Corners.
+  """
+
+  def __init__(
+      self,
+      x: int,
+      y: int,
+      height: int,
+      width: int,
+      border_thickness: int = 1,
+      border_color: ColorValue = '#000000',
+      border_rounding_radius: Tuple[int, int, int, int] = (0, 0, 0, 0),
+      image: pygame.surface.SurfaceType = pygame.font.SysFont(None, 0).render("", True, "#000000"),
+      onClickFunction=(lambda *args, **kwargs: ...),
+      *onClickFunctionArgs,
+      **onClickFunctionKwargs,
+      ) -> None:
+    """
+    Initialize the button.
+    """
+    self.x = x
+    self.y = y
+    self.height = height
+    self.width = width
+    self.border_thickness = border_thickness
+    self.border_color = border_color
+    self.border_rounding_radius = border_rounding_radius
+    self.image_raw = image
+    self.onClickFunction = onClickFunction
+    self.onClickFunctionArgs = onClickFunctionArgs
+    self.onClickFunctionKwargs = onClickFunctionKwargs
+    self.image_rect = self.image_raw.get_rect()
+    self.image_rect.center = (self.x, self.y)
+    self.image = pygame.transform.smoothscale(self.image_raw, (self.width-max(border_rounding_radius)*2, self.height-max(border_rounding_radius)*2))
+    self.clicked = False
+    self.image.blit(self.image, (0, 0), (0, 0, self.width, self.height))
+    self.should_draw = True
+
+  def draw(self, screen: pygame.SurfaceType, force_draw=False):
+    """
+    Draw the button.
+    """
+    mouse_pos = pygame.mouse.get_pos()
+    mouse_clicked = pygame.mouse.get_pressed()[0]
+    hover = self.is_hover(mouse_pos)
+
+    if self.should_draw and not force_draw:
+      # Draw the rounded rectangle
+      rect=pygame.rect.Rect(
+              self.x,
+              self.y,
+              self.width,
+              self.height,
+           )
+      pygame.draw.rect(
+          screen,
+          self.border_color,
+          rect,
+          self.border_thickness,
+          *self.border_rounding_radius
+      )
+      rect.x+=self.border_rounding_radius[0]
+      rect.y+=self.border_rounding_radius[0]
+      screen.blit(self.image, rect.topleft)
+
+      if hover and mouse_clicked and self.should_draw and not self.clicked:
+        if self.onClickFunction:
+          self.onClickFunction(*self.onClickFunctionArgs, **self.onClickFunctionKwargs)
+        self.clicked = True
+      elif not mouse_clicked:
+        self.clicked = False
+
+  def hide(self):
+    self.should_draw = False
+
+  def show(self):
+    self.should_draw = True
+
+  def is_hover(self, mouse_pos) -> bool:
+    """
+    Check if the mouse is hovering over the button.
+    """
+    return (
+        self.x <= mouse_pos[0] <= self.x + self.width
+        and self.y <= mouse_pos[1] <= self.y + self.height
+    )
 class PicklableSurface:
   """
   Representation of pygame.surface.Surface, but it can be pickled
