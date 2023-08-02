@@ -38,6 +38,8 @@ if __name__ == "__main__":
     # do some other pregame stuff
     run = True
     while run:
+      # refill screen
+      game_window.fill('#FFFFFF')
       # title
       game_window.blit(TITLE, ((game_window.get_width()-TITLE.get_width())/2, 3))
       # by
