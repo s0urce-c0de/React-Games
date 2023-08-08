@@ -10,6 +10,10 @@ RGBAOutput=Tuple[int, int, int, int]
 Coordinate = Union[Tuple[float, float], Sequence[float], pygame.math.Vector2]
 ColorValue=Union[pygame.color.Color, int, str, RGBOutput, RGBAOutput, Sequence[int]]
 pygame.init()
+
+def center_screen(screen: pygame.surface.SurfaceType, image: pygame.surface.SurfaceType, rect: bool = True) -> Union[pygame.rect.RectType, Tuple[int, int]]:
+  return image.get_rect().move(screen.get_width()/2-image.get_width()/2, screen.get_height()/2-image.get_height()/2) if rect else (screen.get_width()/2-image.get_width()/2, screen.get_height()/2-image.get_height()/2)
+
 class CircleButton:
   """
   A PyGame Circular Button.
@@ -255,11 +259,11 @@ class MovingCharacter:
     self.disable_right = disable_right
     self.disable_up = disable_up
     self.disable_down = disable_down
-    self.base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
+    self._base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
     for ctrl_dict_key in extra_controls:
-      self.base_extra_controls_dict.update(extra_controls[ctrl_dict_key])
-      extra_controls[ctrl_dict_key]=self.base_extra_controls_dict
-      self.base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
+      self._base_extra_controls_dict.update(extra_controls[ctrl_dict_key])
+      extra_controls[ctrl_dict_key]=self._base_extra_controls_dict
+      self._base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
     self.extra_controls = extra_controls
     self.keys_pressed={}
 
