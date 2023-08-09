@@ -1,21 +1,27 @@
+// import React from 'react'
 import Title from './Title/Title.jsx'
-// import Card from './Card/Card.jsx'
+import Path from './Path.jsx'
 import Create_Cards from './Create_Cards/Create_Cards.jsx'
 import Marquee from './Marquee/Marquee.jsx'
-import React from 'react'
 import './App.css'
 
 const my_games = [
   {
-    title: 'Spaceship Game',
-    image: './favicon.svg',
-    url: "https://replit.com/@KanavGupta7/SpaceShip-Game?v=1",
+    title: 'Hangman',
+    image: `${Path}/game-icons/Hangman.png`,
+    url: "https://github.com/s0urce-c0de/React-Games/tree/main/games/Hangman/",
     img_alt: "Image not found"
   },
   {
-    title: 'SVG Clock',
-    image: './favicon.svg',
-    url: "https://s0urce-c0de.github.io/SVG-Clock",
+    title: 'Spaceship Game',
+    image: `${Path}/game-icons/SpaceShip 2-Player.png`,
+    url: "https://github.com/s0urce-c0de/React-Games/tree/main/games/SpaceShip 2-Player/",
+    img_alt: "Image not found"
+  },
+  {
+    title: 'Space Invaders',
+    image: `${Path}/game-icons/Space Invaders.png`,
+    url: "https://github.com/s0urce-c0de/React-Games/tree/main/games/Space Invaders/",
     img_alt: "Image not found"
   }
 ]

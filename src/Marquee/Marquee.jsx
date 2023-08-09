@@ -15,7 +15,7 @@ export default function Marquee(props) {
   let flattened_children=renderChildren(props.children);
   let length=flattened_children.length;
   let content_styles={
-    width: `calc(${length}*(20px-10px+var(--gap)))`,
+    width: `calc(${length}*(10px+var(--gap)))`,
     animation: `scroll ${length*5}s linear infinite`,
     animationPlayState: hovered ? 'paused' : 'running',
   };

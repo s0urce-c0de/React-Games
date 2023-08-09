@@ -29,6 +29,6 @@
 }
 
 
-.marquee:hover > .marquee__content {
+.marquee:hover .marquee__content {
   animation-play-state: paused;
 }
