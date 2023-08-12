@@ -3,12 +3,13 @@
 
 import pygame
 import sys
-import threading
 import time
 import random
 from typing import Union, Dict, List
 from utils import MovingCharacter, center_screen
 from pathlib import Path
+# for pygbag
+import asyncio
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -20,6 +21,7 @@ game_window = pygame.display.set_mode((853, 480),
 WIDTH=game_window.get_width()
 HEIGHT=game_window.get_height()
 FPS=60
+run=None
 pygame.display.set_caption("Space Invaders")
 pygame.display.set_icon(pygame.image.load(pardir / 'images' / 'favicon.png'))
 
@@ -53,15 +55,6 @@ pygame.display.update()
 def shoot():
   rect=images['bullet'].get_rect().move(SPACESHIP.x+(SPACESHIP.image.get_width()-images['bullet'].get_width())/2, SPACESHIP.y)
   bullets.append({'rect': rect, 'shooter': 'spaceship'})
-def shoot_thread_function():
-  wait=5
-  while run and not game_over_status:
-    new_row()
-    for i in range(0, 1000*wait):
-      if run and not game_over_status:
-        time.sleep(1/1000)
-      else:
-        exit()
 def new_row(alien: pygame.surface.Surface = random.choice(list(images['aliens'].keys()))):
   a2l=[]
   for i in range(0, 8):
@@ -104,13 +97,16 @@ SPACESHIP=MovingCharacter(
   }
 )
   
-if __name__ == "__main__":
+async def main():
   try:
+    #global SCORE
     # do some other pregame stuff
-    game_over_status=False
-    run = True
-    shoot_thread=threading.Thread(target=shoot_thread_function, daemon=False)
-    shoot_thread.start()
+    score=0
+    SCORE = MINI_FONT.render(f"Score: {score}", True, '#FFFFFF')
+    run: bool = True
+    wait: int = 5
+    tic=time.perf_counter()
+    new_row()
     while run:
       game_window.blit(images['background'], (0,0))
       # title
@@ -159,6 +155,10 @@ if __name__ == "__main__":
       # tick the clock
       clock.tick(FPS)
       for event in pygame.event.get(pygame.QUIT): run=False
+      if time.perf_counter()-5>=tic:
+        tic=time.perf_counter()
+        new_row()
+      await asyncio.sleep(0)
     pygame.quit()
     exit()
   finally:
@@ -167,3 +167,4 @@ if __name__ == "__main__":
     if dev:
       raise
     exit()
+asyncio.run(main())
