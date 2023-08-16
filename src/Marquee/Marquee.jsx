@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import './Marquee.css'
 
-function renderChildren(children) {
+function flatten(children) {
   return React.Children.map(children, child => {
     if (Array.isArray(child)) {
-      return renderChildren(child);
+      return flatten(child);
     }
     return child;
   });
@@ -12,7 +12,11 @@ function renderChildren(children) {
 
 export default function Marquee(props) {
   const [hovered, setHovered] = useState(false);
-  let flattened_children=renderChildren(props.children);
+  let flattened_children=flatten(props.children);
+  let flattened_children_height=[];
+  for (let index=0; index<=flattened_children.length; index++) {
+    flattened_children_height.push(flattened_children.height)
+  };
   let length=flattened_children.length;
   let content_styles={
     width: `calc(${length}*(10px+var(--gap)))`,
@@ -20,7 +24,7 @@ export default function Marquee(props) {
     animationPlayState: hovered ? 'paused' : 'running',
   };
   let container_styles={
-    width: `${length*100}%`
+    width: `${length*100}%`,
   }
   return (
     <div 

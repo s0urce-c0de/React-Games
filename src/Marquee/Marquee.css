@@ -1,12 +1,11 @@
 .marquee {
   --gap: 2.75rem;
   display: flex;
-  overflow: hidden;
   user-select: none;
   gap: var(--gap);
-  backdrop-filter: blur(10px);
-  padding: 25px 0;
   width: 100%;
+  height: fit-content;
+  overflow-y: visible;
 }
 
 .marquee__content {

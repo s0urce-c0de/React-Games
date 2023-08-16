@@ -6,7 +6,7 @@ export default function Card(props)  {
     <div className="Card">
       <h4>{props.title}</h4>
       <img src={props.img} alt={props['img-alt']}></img>
-      <a href={props.href} target="_blank">Play Now!</a>
+      <a href={props.href} target="_blank" rel="noreferrer">Play Now!</a>
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import Card from '../Card/Card.jsx'
+import Card from './Card.jsx'
 
-export default function Create_Cards(data) {
+export default function cards2data(data) {
 
   let formatted_data = data.map((obj) => {
     return <Card href={obj.url} title={obj.title} img={obj.image} img-alt={obj.img_alt}/>

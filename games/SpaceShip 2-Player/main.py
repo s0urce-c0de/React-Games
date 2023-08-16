@@ -17,6 +17,7 @@ import pygame
 import sys
 from utils import MovingCharacter, RectangularButton
 from pathlib import Path
+import asyncio
 
 pygame.init()
 clock=pygame.time.Clock()
@@ -178,7 +179,8 @@ RESTART=RectangularButton(
 RESTART.hide()
 game_window.blit(images['background'], (0, 0))
 
-if __name__ == "__main__":
+async def main():
+  global YELLOW_SPACESHIP_HEALTH, RED_SPACESHIP_HEALTH, YELLOW_SPACESHIP_HEALTH_TEXT, RED_SPACESHIP_HEALTH_TEXT, WINNER_TEXT
   try:
     # do some other pregame stuff
     run = True
@@ -248,6 +250,7 @@ if __name__ == "__main__":
       pygame.display.update()
       # tick the clock
       clock.tick(FPS)
+      await asyncio.sleep(0)
       for event in pygame.event.get(pygame.QUIT): run=False
     pygame.quit()
     exit()
@@ -257,3 +260,4 @@ if __name__ == "__main__":
     if dev:
       raise
     exit()
+if __name__=="__main__": asyncio.run(main())

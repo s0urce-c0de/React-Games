@@ -3,15 +3,15 @@ Utilities for games
 """
 
 import pygame
-import types
-from typing import Union, Tuple, Sequence, Optional, Dict, TypedDict
+from typing import Union, Tuple, Sequence, Optional, Dict, TypedDict, Callable
 RGBOutput=Tuple[int, int, int]
 RGBAOutput=Tuple[int, int, int, int]
 Coordinate = Union[Tuple[float, float], Sequence[float], pygame.math.Vector2]
 ColorValue=Union[pygame.color.Color, int, str, RGBOutput, RGBAOutput, Sequence[int]]
+Number=Union[int, float, complex]
 pygame.init()
 
-def center_screen(screen: pygame.surface.SurfaceType, image: pygame.surface.SurfaceType, rect: bool = True) -> Union[pygame.rect.RectType, Tuple[int, int]]:
+def center_screen(screen: pygame.surface.SurfaceType, image: pygame.surface.SurfaceType, rect: bool = True) -> Union[pygame.rect.RectType, Tuple[Number, Number]]:
   return image.get_rect().move(screen.get_width()/2-image.get_width()/2, screen.get_height()/2-image.get_height()/2) if rect else (screen.get_width()/2-image.get_width()/2, screen.get_height()/2-image.get_height()/2)
 
 class CircleButton:
@@ -26,14 +26,14 @@ class CircleButton:
       thickness: int = 1,
       color: ColorValue = (0, 0, 0, 0),
       image: pygame.surface.SurfaceType = pygame.font.SysFont(None, 0).render('', True, "#000000"),
-      onClick: types.FunctionType = (lambda *args, **kwargs: ...),
+      onClick: Callable = (lambda *args, **kwargs: ...),
       *onClickArgs,
       **onClickKwargs
       ) -> None:
     """
     Initialize The Button
     """
-    self.x = x
+    self.x  = x
     self.y = y
     self.radius = radius
     self.thickness = thickness
@@ -239,7 +239,7 @@ def MultiLineText_Blit(surface: pygame.surface.SurfaceType, text: str, pos: Coor
     y += word_height  # Start on new row.
 class ValidControlsDict(TypedDict, total=False):
   key_hold_allowed: bool
-  function: types.FunctionType
+  function: Callable
   function_args: tuple
   function_kwargs: dict
 class MovingCharacter:
@@ -247,7 +247,7 @@ class MovingCharacter:
                max_left: Optional[int] = None, max_bottom: Optional[int] = None, max_right: Optional[int] = None, \
                disable_left: bool = False, disable_right: bool = False, disable_up: bool = False, disable_down: bool = False,\
                extra_controls: Dict[int, ValidControlsDict] = {}) -> None:
-    self.image = image
+    self.image: pygame.surface.SurfaceType = image
     self.controls = controls
     self.max_top = max_top
     self.max_left = max_left
@@ -259,13 +259,13 @@ class MovingCharacter:
     self.disable_right = disable_right
     self.disable_up = disable_up
     self.disable_down = disable_down
-    self._base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
+    self._base_extra_controls_dict: ValidControlsDict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
     for ctrl_dict_key in extra_controls:
       self._base_extra_controls_dict.update(extra_controls[ctrl_dict_key])
       extra_controls[ctrl_dict_key]=self._base_extra_controls_dict
       self._base_extra_controls_dict={'key_hold_allowed': True, 'function': (lambda *args, **kwargs: ...), 'function_args': (), 'function_kwargs': {}}
     self.extra_controls = extra_controls
-    self.keys_pressed={}
+    self.keys_pressed: Dict[int, bool] ={}
 
   def draw(self, target_surf: pygame.surface.SurfaceType, speed: int = 5) -> None:
     # Set default values for max_*

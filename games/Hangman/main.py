@@ -5,6 +5,7 @@ import sys
 import random
 from pathlib import Path
 from utils import CircleButton as Button, MultiLineText_Blit
+import asyncio
 """
 compile with 
 python3 -m pyinstaller --onefile --add-data .:. main.py
@@ -88,8 +89,8 @@ def update_images() -> None:
   global images
   images=[pygame.transform.scale(raw_images[i], (game_window.get_width()//(900/209), game_window.get_height()/(500/216))) for i in range(0, 7)]
 def update_buttons() -> None:
+  global buttons
   for i in range(65, 91):
-    global buttons
     button=buttons[chr(i)]
     win_width=game_window.get_width()//15*15
     unit=win_width/15
@@ -99,7 +100,9 @@ def update_buttons() -> None:
     button.image = pygame.transform.scale(button.image_raw, (2*button.radius, 2*button.radius))
     button.onclickargs=(button.onclickargs[0])
     buttons[chr(i)]=button
-if __name__ == "__main__":
+FPS=60
+async def main():
+  global word, guessed_word
   try:
     word = generate_word(level)
     print(''.join(word))
@@ -127,12 +130,9 @@ if __name__ == "__main__":
       game_window.blit(NORMAL_FONT.render(''.join(guessed_word), True, '#000000'), ((game_window.get_width())//2-game_window.get_width()//6+images[incorrect].get_width()//3+4, TITLE.get_height()+90))
       for key in buttons: buttons[key].draw(game_window)
       pygame.display.update()
-      for event in pygame.event.get():
-        if event.type == 256:
-          run=False
-
-
-
+      clock.tick(FPS)
+      await asyncio.sleep(0)
+      for event in pygame.event.get(pygame.QUIT): run=False
     pygame.quit()
     exit()
   finally:
@@ -141,3 +141,5 @@ if __name__ == "__main__":
     if dev:
       raise
     exit()
+
+if __name__=="__main__": asyncio.run(main())

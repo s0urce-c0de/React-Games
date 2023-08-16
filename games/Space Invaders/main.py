@@ -54,7 +54,7 @@ pygame.display.update()
 
 def shoot():
   rect=images['bullet'].get_rect().move(SPACESHIP.x+(SPACESHIP.image.get_width()-images['bullet'].get_width())/2, SPACESHIP.y)
-  bullets.append({'rect': rect, 'shooter': 'spaceship'})
+  bullets.append({'rect': rect})
 def new_row(alien: pygame.surface.Surface = random.choice(list(images['aliens'].keys()))):
   a2l=[]
   for i in range(0, 8):
@@ -99,7 +99,6 @@ SPACESHIP=MovingCharacter(
   
 async def main():
   try:
-    #global SCORE
     # do some other pregame stuff
     score=0
     SCORE = MINI_FONT.render(f"Score: {score}", True, '#FFFFFF')
@@ -120,45 +119,44 @@ async def main():
       bullet_index = 0
       for bullet in bullets:
         bullet_deleted=False
-        if bullet['shooter']=='spaceship':
-          row=0
-          for alien_row in aliens:
-            num=0
-            for alien in alien_row:
-              alien_deleted=False
-              if bullet['rect'].colliderect(alien[1]):
-                alien_deleted=True
-                del alien_row[num]
-                bullet_deleted=True
-                del bullets[bullet_index]
-                score += 1
-                SCORE = MINI_FONT.render(f"Score: {score}", True, '#FFFFFF')
-              num+=1 if not alien_deleted else 0
-            row+=1
+        row=0
+        for alien_row in aliens:
+          num=0
+          for alien in alien_row:
+            alien_deleted=False
+            if bullet['rect'].colliderect(alien[1]):
+              alien_deleted=True
+              del alien_row[num]
+              bullet_deleted=True
+              del bullets[bullet_index]
+              score += 1
+              SCORE = MINI_FONT.render(f"Score: {score}", True, '#FFFFFF')
+            num+=1 if not alien_deleted else 0
+          row+=1
         if bullet['rect'].y<=0 or bullet['rect'].y>=HEIGHT:
           del bullets[bullet_index]
           bullet_deleted=True
-        if bullet['shooter'] == 'spaceship' and not bullet_deleted:
+        if not bullet_deleted:
           bullets[bullet_index]['rect'].y-=10
-        elif bullet['shooter'] == 'alien' and not bullet_deleted:
-          bullets[bullet_index]['rect'].y=10
         game_window.blit(images['bullet'], bullet['rect'])
         if not bullet_deleted:
           bullet_index+=1
       for alien_row in aliens:
         for alien in alien_row:
           game_window.blit(alien[0], alien[1])
-          if alien[1].colliderect(SPACESHIP.image.get_rect().move(SPACESHIP.x, SPACESHIP.y)): 
+          if alien[1].colliderect(SPACESHIP.image.get_rect().move(SPACESHIP.x, SPACESHIP.y)):
             game_over()
+          elif alien[1].y+alien[1].height>=HEIGHT:
+              game_over()
       game_window.blit(images['GAME_OVER'], center_screen(game_window, images['GAME_OVER']))
+      if time.perf_counter()-wait>=tic:
+        tic=time.perf_counter()
+        new_row()
       pygame.display.update()
       # tick the clock
       clock.tick(FPS)
-      for event in pygame.event.get(pygame.QUIT): run=False
-      if time.perf_counter()-5>=tic:
-        tic=time.perf_counter()
-        new_row()
       await asyncio.sleep(0)
+      for event in pygame.event.get(pygame.QUIT): run=False
     pygame.quit()
     exit()
   finally:
@@ -167,4 +165,4 @@ async def main():
     if dev:
       raise
     exit()
-asyncio.run(main())
+if __name__=='__main__': asyncio.run(main())
