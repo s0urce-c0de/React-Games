@@ -3,8 +3,9 @@
 
 import pygame
 import sys
-from utils import CircleButton as Button, MultiLineText_Blit
+from utils import MovingCharacter
 from pathlib import Path
+import asyncio
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -33,7 +34,9 @@ images = raw_images
 
 def new_level() -> None: ...
 
-if __name__ == "__main__":
+async def main():
+  # global some stuff
+  global level
   try:
     # do some other pregame stuff
     run = True
@@ -57,3 +60,5 @@ if __name__ == "__main__":
     if dev:
       raise
     exit()
+
+if __name__="__main__": asyncio.run(main())
